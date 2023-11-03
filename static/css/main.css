@@ -1,0 +1,73 @@
+/* 全体のcss */
+body {
+    margin: 0;
+}
+.top-header{
+    background-color: #567e90;
+}
+.header-title:before {
+    content: url(../img/logo.svg);
+    vertical-align: middle;
+    display: inline-block;
+    margin: 5px;
+    height: 50px;
+}
+.header-title {
+    font-size: 20px;
+    color:#f9f9f9;
+}
+/* 切り替えたぶのcss */
+.view {
+    margin: 50px 5%;
+}
+.table {
+    color: #808080;
+    width:300px;
+    margin:5px 20px;
+    display: flex;
+    justify-content: space-between;
+}
+.active {
+    color: #000000;
+}
+.tab-contents-item {
+    display: none;
+}
+.tab-contents-item.show {
+    display: block;
+}
+/* 入力エリアのcss */
+.input-frame {
+    /* width: 90%; */
+    /* margin: auto; */
+    margin-top: 20px;
+}
+.textlines {
+    border: 2px solid #567e90;
+    border-radius: 0.67em;
+    width: 100%;
+    height: 400px;
+    resize: none;
+    line-height: 1.2;
+}
+.submit-outter {
+    position: absolute;
+    margin-top: 20px;
+    width: 285px;
+    height: 80px;
+    background-color: #567e90;
+    border-radius: 62.5px;
+}
+.submit-inner {
+    width: 285px;
+    top: 17px;
+    color: #f9f9f9;
+    font-size: 40px;
+    text-align: center;
+    white-space: nowrap;
+    position: absolute;
+    font-family: "Inter", Helvetica;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: normal;
+}

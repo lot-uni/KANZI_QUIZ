@@ -1,6 +1,6 @@
 $(document).ready(function() {
   $("#fetchData").click(function() {
-      const url = "http://127.0.0.1:8000/normal/";
+      const url = "https://l.combu.dev/normal/";
       var context = document.getElementById("context").value;
       var title = document.getElementById("title").value;
       var quizSize = document.getElementById("quizSize").value;

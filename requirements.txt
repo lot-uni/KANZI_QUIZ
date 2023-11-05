@@ -1,0 +1,7 @@
+uvicorn
+fastapi
+jaconv
+pykakasi
+Jinja2
+Pillow
+reportlab

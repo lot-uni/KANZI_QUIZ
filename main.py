@@ -62,9 +62,10 @@ def judge(text):
     return bool(pattern.search(text))
 
 sample=splitToSentences(text)
-for i in sample:
-    if judge(i):
-        sentences.append(i[:35])
+for text in sample:
+    short_text=text[:35]
+    if judge(short_text):
+        sentences.append(short_text)
 
 if len(sentences)<10:
     sentences=random.sample(sentences,len(sentences))

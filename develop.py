@@ -6,34 +6,10 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from pathlib import Path
 from datetime import datetime
-
 import os
-import re
-import jaconv
-import random
-import pykakasi
 
 
-kks = pykakasi.kakasi()
 pattern = r'[\u4e00-\u9faf]+'
-
-def create_question(content):
-    print(content)
-    word_list = []
-    kangi_list = []
-    result = kks.convert(content)
-    for item in result:
-        word_list.append(item["orig"])
-    for item in word_list:
-        if re.findall(pattern,item)!=[]:
-            kangi_list.append(item)
-    random.shuffle(kangi_list)
-    word = kangi_list[0]
-    hira = kks.convert(word)[0]["hira"]
-    kangi_yomi = re.sub('[一-龥]','',word)
-    kangi_yomi = '**'+jaconv.hira2kata(re.sub(kangi_yomi,'',hira))+'**'
-    word = re.sub(u'[ぁ-んァ-ン]','',word)
-    return re.sub(word,kangi_yomi,content),word 
 
 app = FastAPI()
 class RequestData(BaseModel):
@@ -60,7 +36,6 @@ def process_context(request_data: RequestData):
     }
 @app.get("/get_file/{filename:path}")
 async def get_file(filename: str):
-    '''任意ファイルのダウンロード'''
     current = Path()
     file_path = current / "files" / filename
     now = datetime.now()

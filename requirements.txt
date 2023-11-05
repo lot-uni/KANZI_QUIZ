@@ -5,3 +5,4 @@ pykakasi
 Jinja2
 Pillow
 reportlab
+argparse

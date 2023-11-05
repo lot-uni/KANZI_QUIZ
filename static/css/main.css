@@ -18,17 +18,23 @@ body {
 }
 /* 切り替えたぶのcss */
 .view {
-    margin: 50px 5%;
+    margin: 50px;
 }
 .table {
     color: #808080;
-    width:300px;
-    margin:5px 20px;
+    max-width: 328px;
     display: flex;
     justify-content: space-between;
 }
+.tab {
+    padding: 10px;
+    width: 50%;;
+    cursor: pointer;
+}
 .active {
-    color: #000000;
+    color: #f9f9f9;
+    background: #567e90;
+    border-radius: 10px 10px 0 0;
 }
 .tab-contents-item {
     display: none;
@@ -36,10 +42,11 @@ body {
 .tab-contents-item.show {
     display: block;
 }
+hr {
+    margin: 0px;
+}
 /* 入力エリアのcss */
 .input-frame {
-    /* width: 90%; */
-    /* margin: auto; */
     margin-top: 20px;
 }
 .textlines {
@@ -50,24 +57,24 @@ body {
     resize: none;
     line-height: 1.2;
 }
-.submit-outter {
-    position: absolute;
-    margin-top: 20px;
-    width: 285px;
-    height: 80px;
-    background-color: #567e90;
-    border-radius: 62.5px;
+button {
+    border: 0;
+    border-radius: 5px;
+    background: #567e90;
+    color: #fff;
+    padding: 8px 16px;
+    font-size: 25px;
+    cursor: pointer;
+    margin: 10px 0;
 }
-.submit-inner {
-    width: 285px;
-    top: 17px;
-    color: #f9f9f9;
-    font-size: 40px;
-    text-align: center;
-    white-space: nowrap;
-    position: absolute;
-    font-family: "Inter", Helvetica;
-    font-weight: 400;
-    letter-spacing: 0;
-    line-height: normal;
+#DLC {
+    display: none;
+}
+a {
+    text-decoration: none;
+    color: #fff;
+    display: block;
+}
+.attention {
+    color: red;
 }

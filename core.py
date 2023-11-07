@@ -1,7 +1,8 @@
 import re
 import random
 import jaconv
-import pykakasi
+import collections
+from pykakasi import kakasi
 import argparse
 
 from PIL import Image, ImageDraw, ImageFont
@@ -24,63 +25,80 @@ flie_pas='context.txt'
 text=""
 with open(flie_pas, 'r') as file:
     text = file.read()
-question_templates=[f'{title}名前＝　　　　　　　＝',"　　　　　　　　　　赤字のカタカナを漢字に直せ"]
-explanation_templates=[f'{args.title} 解答例']
+question_templates=[f'{title}名前＝　　　　　　　＝',"　　　　　　　赤字を漢字に直せ︽必要なら送り仮名も書くこと︾"]
+explanation_templates=[" ",f'{args.title} 解答例']
 questions=[]
 answers=[]
 
 sentences=[]
 questions=[]
 answers=[]
-sign=r'[\u4e00-\u9fa5]'
-kks = pykakasi.kakasi()
 
-def create_question(content):
-    word_list = []
-    kangi_list = []
-    result = kks.convert(content)
-    for item in result:
-        word_list.append(item["orig"])
-    for item in word_list:
-        if re.findall(sign,item)!=[]:
-            kangi_list.append(item)
-    random.shuffle(kangi_list)
-    word = kangi_list[0]
-    hira = kks.convert(word)[0]["hira"]
-    kangi_yomi = re.sub('[一-龥]','',word)
-    kangi_yomi = '^'+jaconv.hira2kata(re.sub(kangi_yomi,'',hira))+'^'
-    word = re.sub(u'[ぁ-んァ-ン]','',word)
-    return re.sub(word,kangi_yomi,content),word
+# jfioewaffipawojeoiaj
 
-def splitToSentences(text):
-    text=text.replace(' ','')
-    text=text.replace('\n','ע')
-    text=text.replace('(','︽')
-    text=text.replace('（','︽')
-    text=text.replace(')','︾')
-    text=text.replace('）','︾')
-    text=text.replace('…','...')
-    text=text.replace('\u3000', '')
-    sentences = re.split(r'[ע\．，、 。！？,]', text)
-    return sentences
-def judge(text):
-    pattern = re.compile(sign)
-    return bool(pattern.search(text))
+kanji_list=[]
+kanji_once=[]
+quiz_candidate=[]
+quiz=[]
 
-sample=splitToSentences(text)
-for text in sample:
-    short_text=text[:35]
-    if judge(short_text):
-        sentences.append(short_text)
+kakasi_instance=kakasi()
+def splitToSentences(context):
+    context=context.replace(' ','')
+    context=context.replace('\n','ע')
+    context=context.replace('(','︽')
+    context=context.replace('（','︽')
+    context=context.replace(')','︾')
+    context=context.replace('）','︾')
+    context=context.replace('…','...')
+    context=context.replace('\u3000', '')
+    list_before=re.split(r'[ע\．，、 。！？,]', context)
+    list_before=[text[:35] for text in list_before]
+    list_after=[text for text in list_before if len(list_before)>3]
+    return list_after
+sentense_list=splitToSentences(text)
 
-if len(sentences)<max:
-    sentences=random.sample(sentences,len(sentences))
+for word in kakasi_instance.convert(''.join(sentense_list)):
+    pattern = re.compile(r'[\u4e00-\u9fa5]')
+    if pattern.search(word['orig']):
+        kanji_list.append(word['orig'])
+        # kanji_list.append(re.sub(r'[^\u4e00-\u9fff]+', '',word['orig']))
+kanji_list_detail=collections.Counter((kanji_list))
+
+for kanji in kanji_list_detail.items():
+    if(kanji[1]==1):
+        kanji_once.append(kanji[0])
+        
+for kanji in kanji_once:
+    for text in sentense_list:
+        if(kanji in text):
+            quiz_candidate.append(text)
+quiz_candidate=list(set(quiz_candidate))
+
+def kanji_word_mining(text):
+    kanji_list=[]
+    for word in kakasi_instance.convert(text):
+        kanji_list.append(word['orig'])
+    return list(filter(None, kanji_list))
+
+
+for text in quiz_candidate:
+    for context in kanji_word_mining(text):
+        for kanji in kanji_once:
+            if(kanji==context):
+                for word in kakasi_instance.convert(text):
+                    if(word['orig']==kanji):
+                        quiz.append([text,word['kana'],kanji])
+                break
+        else:
+            continue
+        break
+if(len(quiz)>=max):
+    quiz_list=random.sample(quiz,max)
 else:
-    sentences=random.sample(sentences,max)
-for text in sentences:
-    hoge=create_question(text)
-    questions.append(hoge[0])
-    answers.append(hoge[1])
+    quiz_list=quiz
+for context in quiz_list:
+    questions.append(context[0].replace(context[2],"^"+context[1]+"^"))
+    answers.append(context[0].replace(context[2],"^"+context[2]+"^"))
 def vertical_draw(text,size,x,y):
     font = ImageFont.truetype("fonts/GenShinGothic-Light.ttf", size)
     vertical_text = "\n".join(text)

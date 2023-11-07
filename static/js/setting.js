@@ -1,6 +1,6 @@
 $(document).ready(function() {
   $("#fetchData").click(function() {
-      const url = "http://127.0.0.1:8000/normal/";
+      const url = location.href +"normal/";
       var context = document.getElementById("context").value;
       var title = document.getElementById("title").value;
       var quizSize = document.getElementById("quizSize").value;
@@ -23,7 +23,7 @@ $(document).ready(function() {
       dataType: "json", // レスポンスのデータタイプをJSONに指定
           success: function(data) {
               $("#DLC").css('display','initial');
-              alert("pdfの生成に成功しました。")
+              alert("問題がダウンロードできます")
           },
           error: function(xhr, status, error) {
             $("#result").text("Error: " + error);

@@ -32,7 +32,10 @@ def process_context(request_data: RequestData):
     title=request_data.title.replace(' ','　')
     with open("context.txt", "w") as file:
         file.write(request_data.context)
-    os.system(f'python3 core.py -n {request_data.quizSize} -t {title}')
+    if request_data.quizSize!="":
+        os.system(f'python3 core.py -n {request_data.quizSize} -t {title}')
+    else:
+        os.system(f'python3 core.py -n {"漢字書き取りテスト"} -t {title}')
     return {
         "log": "ok"
     }

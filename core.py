@@ -53,10 +53,10 @@ def splitToSentences(context):
     context=context.replace('\u3000', '')
     list_before=re.split(r'[ע\．，、 。！？,]', context)
     list_before=[text[:35] for text in list_before]
-    list_after=[text for text in list_before if len(list_before)>3]
+    list_after=[text for text in list_before if len(text)>2]
     return list_after
 sentense_list=splitToSentences(text)
-
+print(sentense_list)
 for word in kakasi_instance.convert(''.join(sentense_list)):
     pattern = re.compile(r'[\u4e00-\u9fa5]')
     if pattern.search(word['orig']):
@@ -92,10 +92,13 @@ for text in quiz_candidate:
         else:
             continue
         break
-if(len(quiz)>=max):
+if(len(quiz)>max):
     quiz_list=random.sample(quiz,max)
+    print(quiz_list)
 else:
     quiz_list=quiz
+    print(quiz_list)
+
 for context in quiz_list:
     questions.append(context[0].replace(context[2],"^"+context[1]+"^"))
     answers.append(context[0].replace(context[2],"^"+context[2]+"^"))

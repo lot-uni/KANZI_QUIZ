@@ -16,6 +16,7 @@ class RequestData(BaseModel):
     context: str
     title: str
     quizSize: str
+    level: int
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -29,16 +30,21 @@ async def read_root(request: Request):
 
 @app.post("/normal/")
 def process_context(request_data: RequestData):
+    print(request_data.level)
     title=request_data.title.replace(' ','　')
     with open("context.txt", "w") as file:
         file.write(request_data.context)
     if request_data.quizSize!="":
-        os.system(f'python3 core.py -n {request_data.quizSize} -t {title}')
+        os.system(f'python3 clone.py -n {request_data.quizSize} -t {title} -l {request_data.level}')
+        return {
+            "log": "ok"
+        }
     else:
-        os.system(f'python3 core.py -n {"漢字書き取りテスト"} -t {title}')
-    return {
-        "log": "ok"
-    }
+        print('エラー')
+        return {
+            "log": "error"
+        }
+
 @app.get("/get_file/{filename:path}")
 async def get_file(filename: str):
     current = Path()

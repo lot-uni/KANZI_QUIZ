@@ -4,12 +4,14 @@ $(document).ready(function() {
       var context = document.getElementById("context").value;
       var title = document.getElementById("title").value;
       var quizSize = document.getElementById("quizSize").value;
+      var level = document.getElementById("level").value;
 
-      console.log(title);
+      console.log(level);
       var data = {
         context: context,
         title: title,
-        quizSize: quizSize
+        quizSize: quizSize,
+        level: level
       }; // 送信するデータをオブジェクトとして作成
       $.ajax({
       type: "POST", // POSTリクエスト
@@ -23,10 +25,12 @@ $(document).ready(function() {
       dataType: "json", // レスポンスのデータタイプをJSONに指定
           success: function(data) {
               $("#DLC").css('display','initial');
-              alert("問題がダウンロードできます")
+              alert("問題がダウンロードできます");
+              console.log("he")
           },
           error: function(xhr, status, error) {
             $("#result").text("Error: " + error);
+            console.log("error")
           }
       });
   });

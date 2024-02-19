@@ -1,0 +1,1 @@
+https://github.com/fnshr/kyo-kan/blob/master/kyoiku-kanji-2017.csv

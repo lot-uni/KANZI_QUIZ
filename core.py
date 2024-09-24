@@ -57,6 +57,10 @@ text=text.replace('）','︾')
 text=text.replace('…','...')
 text=text.replace('\u3000', '')
 
+# 関数を定義する
+def uni_kanji_checker(char):
+    pattern = re.compile(r'[\u4e00-\u9fa5]')
+    return bool(pattern.match(char))
 
 # 漢字の含まれた単語を抽出
 kakasi_instance=kakasi()
@@ -71,8 +75,10 @@ for k in kanji_list_detail:
     kanji_level_scores=[]
     for item in list(k):
         df_kanji=df[df["Kanji"].str.contains(item)]
-        if(df_kanji.empty):
-            kanji_level_scores.append(7)#
+        if(df_kanji.empty)and(not uni_kanji_checker(item)):
+            pass
+        elif(df_kanji.empty):
+            kanji_level_scores.append(7)
         else:
             kanji_level_scores.append(int(df_kanji["Grade_2017"].values))
     if(kanji_level_scores>=[7]):

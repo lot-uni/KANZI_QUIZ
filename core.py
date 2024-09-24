@@ -1,18 +1,39 @@
-import re
-import random
-import jaconv
-import collections
 from pykakasi import kakasi
-import argparse
-
 from PIL import Image, ImageDraw, ImageFont
 from reportlab.lib.pagesizes import B5
 from reportlab.pdfgen import canvas
 
+import collections
+import argparse
+import re
+import random
+import pandas as pd
+
+# オプションの内容を取得
 parser = argparse.ArgumentParser(description='')
-parser.add_argument('-n', '--option', dest='quizSize', default='作成問題数')
-parser.add_argument('-t', '--option1', dest='title', default='問題のタイトル')
+parser.add_argument('-n', dest='quizSize', default='作成問題数')
+parser.add_argument('-t', dest='title', default='問題のタイトル')
+parser.add_argument('-l', dest='level', default='問題レベル')
 args = parser.parse_args()
+
+# 問題生成とpdfを作成する
+with open('context.txt', 'r') as file:
+    text = file.read()
+    file.close()
+
+# 必要な変数を定義
+question_templates=[f'{args.title}　学年　クラス　名前＝　　　　　　　＝',"　　　　　　　赤字を漢字に直せ︽必要なら送り仮名も書くこと︾"]
+explanation_templates=[" ",f'{args.title} 解答例']
+questions=[]
+answers=[]
+
+kanji_list=[]
+quiz_pool=[]
+quiz=[]
+
+level1=[]
+level2=[]
+level3=[]
 
 max = int(args.quizSize)
 title = args.title+str(int(19-len(args.title))*" ")
@@ -21,68 +42,84 @@ text_color=False
 image = Image.new("RGB", (int(height), int(width)), "white")
 draw = ImageDraw.Draw(image)
 
-flie_pas='context.txt'
-text=""
-with open(flie_pas, 'r') as file:
-    text = file.read()
-question_templates=[f'{title}名前＝　　　　　　　＝',"　　　　　　　赤字を漢字に直せ︽必要なら送り仮名も書くこと︾"]
-explanation_templates=[" ",f'{args.title} 解答例']
-questions=[]
-answers=[]
+text_color=False
 
-sentences=[]
-questions=[]
-answers=[]
+sentence_list=re.split(r'[ע\．，、 。！？,]', text)# textのデータを整形する←要改善、自然に文章を具切るにはどうしたらいいのか？
+sentence_list=[text for text in sentence_list if len(text)>4]
+sentence_list=[text[:30] for text in sentence_list]
+
+text=text.replace(' ','')
+text=text.replace('\n','ע')
+text=text.replace('(','︽')
+text=text.replace('（','︽')
+text=text.replace(')','︾')
+text=text.replace('）','︾')
+text=text.replace('…','...')
+text=text.replace('\u3000', '')
+
+
+# 漢字の含まれた単語を抽出
+kakasi_instance=kakasi()
+for word in kakasi_instance.convert(''.join(sentence_list)):
+    if re.search(r'[\u4e00-\u9fa5]',word['orig']):
+        kanji_list.append(word['orig'])
+
+# 漢字のレベルを判定する
+kanji_list_detail=collections.Counter((kanji_list))
+df=pd.read_csv('json/kyoiku-kanji-2017.csv')
+for k in kanji_list_detail:
+    kanji_level_scores=[]
+    for item in list(k):
+        df_kanji=df[df["Kanji"].str.contains(item)]
+        if(df_kanji.empty):
+            kanji_level_scores.append(7)#
+        else:
+            kanji_level_scores.append(int(df_kanji["Grade_2017"].values))
+    if(kanji_level_scores>=[7]):
+        level3.append(k)
+    elif(kanji_level_scores<=[1,2]):
+        level1.append(k)
+    else:
+        level2.append(k)
+if(args.level=="1"):
+    for i in level3:
+        kanji_list_detail.pop(i)
+    for i in level2:
+        kanji_list_detail.pop(i)
+elif(args.level=="2"):
+    for i in level1:
+        kanji_list_detail.pop(i)
+    for i in level3:
+        kanji_list_detail.pop(i)
+elif(args.level=="3"):
+    for i in level3:
+        kanji_list_detail.pop(i)
+elif(args.level=="4"):
+    for i in level1:
+        kanji_list_detail.pop(i)
+    for i in level2:
+        kanji_list_detail.pop(i)
 
 kanji_list=[]
-kanji_once=[]
-quiz_candidate=[]
-quiz=[]
-
-kakasi_instance=kakasi()
-def splitToSentences(context):
-    context=context.replace(' ','')
-    context=context.replace('\n','ע')
-    context=context.replace('(','︽')
-    context=context.replace('（','︽')
-    context=context.replace(')','︾')
-    context=context.replace('）','︾')
-    context=context.replace('…','...')
-    context=context.replace('\u3000', '')
-    list_before=re.split(r'[ע\．，、 。！？,]', context)
-    list_before=[text[:35] for text in list_before]
-    list_after=[text for text in list_before if len(text)>2]
-    return list_after
-sentense_list=splitToSentences(text)
-for word in kakasi_instance.convert(''.join(sentense_list)):
-    pattern = re.compile(r'[\u4e00-\u9fa5]')
-    if pattern.search(word['orig']):
-        kanji_list.append(word['orig'])
-    
-print(kanji_list)
-kanji_list_detail=collections.Counter((kanji_list))
-
-
 for kanji in kanji_list_detail.items():
     if(kanji[1]==1):
-        kanji_once.append(kanji[0])
-        
-for kanji in kanji_once:
-    for text in sentense_list:
+        kanji_list.append(kanji[0])
+for kanji in kanji_list:
+    for text in sentence_list:
         if(kanji in text):
-            quiz_candidate.append(text)
-quiz_candidate=list(set(quiz_candidate))
+            quiz_pool.append(text)
+quiz_pool=list(set(quiz_pool))
 
 def kanji_word_mining(text):
-    kanji_list=[]
+    word_list=[]
     for word in kakasi_instance.convert(text):
-        kanji_list.append(word['orig'])
-    return list(filter(None, kanji_list))
+        word_list.append(word['orig'])
+    return list(filter(None, word_list))
 
 
-for text in quiz_candidate:
+for text in quiz_pool:
     for context in kanji_word_mining(text):
-        for kanji in kanji_once:
+        for kanji in kanji_list:
             if(kanji==context):
                 for word in kakasi_instance.convert(text):
                     if(word['orig']==kanji):
@@ -93,10 +130,8 @@ for text in quiz_candidate:
         break
 if(len(quiz)>max):
     quiz_list=random.sample(quiz,max)
-    print(quiz_list)
 else:
-    quiz_list=quiz
-    print(quiz_list)
+    quiz_list=random.sample(quiz,len(quiz))
 
 for context in quiz_list:
     questions.append(context[0].replace(context[2],"^"+context[1]+"^"))

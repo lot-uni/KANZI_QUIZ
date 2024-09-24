@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="./static/css/main.css">
     <link rel="icon" href="./static/img/icon.svg" type="image/svg+xml">
     <title>漢字ディフュージョン</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script> 
+    <script src="./static/js/jquery.min.js"></script> 
 </head>
 <body>
     <header class="top-header">
@@ -35,7 +35,7 @@
             <br>
             <div class="tab-contents-item">
                 <div>
-                    <p>タイトル: <input type="text" id="title" value="漢字書き取りテスト　学年　クラス　" maxlength="18"></p>
+                    <p>タイトル: <input type="text" id="title" value="漢字書き取りテスト" maxlength="18"></p>
                     <p class="attention">*半角スペースを入れないでください。</p>
                     <p>
                         問題数:
@@ -71,9 +71,11 @@
                     <p>
                         難易度: 
                         <select id="level" name="problemCount">
-                            <option value="1">初級編</option>
-                            <option value="2" selected>中級編</option>
-                            <option value="3">上級編</option>
+                            <option value="1">初級編(小学生低学年の漢字)</option>
+                            <option value="2" selected>中級編(小学校高学年の漢字)</option>
+                            <option value="3">上級編(小学校の漢字全範囲)</option>
+                            <option value="4">特上編(小学校以下の全ての範囲)</option>
+                            <option value="5">究極編(常用漢字全範囲)</option>
                         </select>
                     </p>
             </div>

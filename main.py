@@ -8,7 +8,6 @@ from pathlib import Path
 from datetime import datetime
 import os
 
-
 pattern = r'[\u4e00-\u9faf]+'
 
 app = FastAPI()
@@ -35,7 +34,7 @@ def process_context(request_data: RequestData):
     with open("context.txt", "w") as file:
         file.write(request_data.context)
     if request_data.quizSize!="":
-        os.system(f'python3 clone.py -n {request_data.quizSize} -t {title} -l {request_data.level}')
+        os.system(f'python3 core.py -n {request_data.quizSize} -t {title} -l {request_data.level}')
         return {
             "log": "ok"
         }
